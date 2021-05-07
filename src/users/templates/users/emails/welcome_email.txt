@@ -1,0 +1,10 @@
+{% autoescape off %}
+  A new account has been created for you on dj-rcp using the email address {{ user.email }}.
+
+  Please go to the following page to set your password:
+  {{ protocol }}://{{ domain }}/set-password/?uid={{ uid }}&amp;token={{ token }}&amp;email={{ email_encoded }}&amp;welcome=true
+
+
+  Kind regards,<br><br>
+  {{ site_name }}
+{% endautoescape %}

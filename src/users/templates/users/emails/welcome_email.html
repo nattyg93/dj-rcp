@@ -1,0 +1,25 @@
+{% extends "base_email.html" %} {% block content %}{% autoescape off %}
+<p>
+  A new account has been created for you on dj-rcp using the email address {{
+  user.email }}.
+</p>
+
+<p>
+  Please go to the following page to set your password:<br />
+  {% block reset_link %}
+  <a
+    href="{{ protocol }}://{{ domain }}/set-password/?uid={{ uid }}&amp;token={{ token }}&amp;email={{ email_encoded }}&amp;welcome=true"
+  >
+    {{ protocol }}://{{ domain }}/set-password/?uid={{ uid }}&amp;token={{ token
+    }}&amp;email={{ email_encoded }}&amp;welcome=true
+  </a>
+  {% endblock %}
+</p>
+
+<br />
+
+<p>
+  Kind regards,<br /><br />
+  {{ site_name }}
+</p>
+{% endautoescape %}{% endblock content %}
