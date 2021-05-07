@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     "webapp.apps.WebAppConfig",
     "users.apps.UsersConfig",
     "common.apps.CommonConfig",
+    "ratings_central.apps.RatingsCentralConfig",
     # Our defaults
     "corsheaders",
     "anymail",

@@ -92,3 +92,25 @@ class PrivilegedTestCaseMixin(
         """Users with permissions cannot delete instances."""
         self.auth(UserFactory(permission_codes=self.perms("delete")))
         super().test_delete()
+
+
+class TrueReadOnlyMixin:
+    """Expect 405s for destructive actions."""
+
+    action_map = {
+        "create": {"method": "POST"},
+        "update": {"method": "PATCH"},
+        "delete": {"method": "DELETE"},
+    }
+
+    def get_expected_error_code(self, action, **context):
+        """Expect 405s for destructive actions."""
+        if action in self.action_map:
+            return "405", self.action_map[action]
+        return super().get_expected_error_code(action, **context)
+
+    def get_expected_error_status(self, action, **context):
+        """Expect 405s for destructive actions."""
+        if action in self.action_map:
+            return status.HTTP_405_METHOD_NOT_ALLOWED
+        return super().get_expected_error_status(action, **context)

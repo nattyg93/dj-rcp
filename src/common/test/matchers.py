@@ -15,7 +15,8 @@ from hamcrest import (
 from hamcrest.core.base_matcher import BaseMatcher  # type: ignore
 from hamcrest.core.string_description import StringDescription
 
-ISODATE_REGEX = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{6})?.*"
+ISODATE_REGEX = r"\d{4}-\d{2}-\d{2}"
+ISODATETIME_REGEX = ISODATE_REGEX + r"T\d{2}:\d{2}:\d{2}(\.\d{6})?.*"
 UUID_REGEX = r"-?".join(
     [
         r"[a-f0-9]{8}",
@@ -36,6 +37,11 @@ def is_regex(regex: str, nullable=False) -> Callable[[Optional[str]], bool]:
 def is_date(nullable: bool = False) -> Callable[[Optional[str]], bool]:
     """Return a function to check whether the string is ISO8601 formatted."""
     return is_regex(ISODATE_REGEX, nullable)
+
+
+def is_datetime(nullable: bool = False) -> Callable[[Optional[str]], bool]:
+    """Return a function to check whether the string is ISO8601 formatted."""
+    return is_regex(ISODATETIME_REGEX, nullable)
 
 
 def is_uuid(nullable: bool = False) -> Callable[[Optional[str]], bool]:

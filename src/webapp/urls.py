@@ -8,6 +8,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from rest_framework.viewsets import ViewSetMixin
 
+import ratings_central.views
 import users.views
 from webapp.views import schema_view
 
@@ -17,6 +18,8 @@ routes: List[Tuple[str, ViewSetMixin]] = [
     ("sessions", users.views.SessionView),
     ("password-resets", users.views.PasswordResetView),
     ("password-reset-confirmations", users.views.PasswordResetConfirmView),
+    ("players", ratings_central.views.PlayerView),
+    ("clubs", ratings_central.views.ClubView),
 ]
 
 v1_router = DefaultRouter()
