@@ -8,7 +8,7 @@ from ratings_central import enums
 class Player(models.Model):
     """Ratings Central Player information."""
 
-    rc_id = models.IntegerField()
+    rc_id = models.IntegerField(db_index=True)
     rating = models.IntegerField()
     st_dev = models.IntegerField()
     last_played = models.DateField()
@@ -39,7 +39,7 @@ class Player(models.Model):
 class Club(models.Model):
     """Ratings Central Club information."""
 
-    rc_id = models.IntegerField()
+    rc_id = models.IntegerField(db_index=True)
     name = models.CharField(max_length=50)
     nickname = models.CharField(max_length=15)
     address_one = models.CharField(max_length=50)
@@ -64,5 +64,5 @@ class Club(models.Model):
 class Director(models.Model):
     """Ratings Central Director information."""
 
-    rc_id = models.IntegerField()
+    rc_id = models.IntegerField(db_index=True)
     password = encrypt(models.TextField())

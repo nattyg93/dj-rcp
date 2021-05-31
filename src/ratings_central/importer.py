@@ -2,7 +2,7 @@
 import csv
 import zipfile
 from io import BytesIO, StringIO
-from typing import Any, Callable, Dict, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 import requests
 from django.db.models import Model
@@ -45,7 +45,7 @@ def import_club_list(club_list: str) -> None:
     """Import the list of clubs."""
     import_data_to_model(
         model=models.Club,
-        id_mapping=("rc_id", "ID"),
+        id_mapping=("ID", "rc_id"),
         defaults_mapping={
             "Name": "name",
             "Nickname": "nickname",
@@ -70,7 +70,7 @@ def import_player_list(player_list: str) -> None:
     """Import the list of players."""
     import_data_to_model(
         model=models.Player,
-        id_mapping=("rc_id", "ID"),
+        id_mapping=("ID", "rc_id"),
         defaults_mapping={
             "Name": "name",
             "Rating": "rating",
@@ -104,11 +104,16 @@ def import_data_to_model(
     data: str,
 ):
     """Import the csv data to a model."""
-    model_rc_id, id_key = id_mapping
+    id_key, model_rc_id = id_mapping
+    instances: Dict[str, Model] = {}
+    fields = [
+        field[0] if isinstance(field, tuple) else field
+        for field in defaults_mapping.values()
+    ]
     for row in csv.DictReader(StringIO(data)):
         if id_key not in row:
             continue
-        defaults = {}
+        mapped_values = {model_rc_id: row[id_key]}
         for key, value in row.items():
             if key not in defaults_mapping:
                 continue
@@ -117,5 +122,29 @@ def import_data_to_model(
             if isinstance(mapped_key, tuple):
                 converter = mapped_key[1]  # type: ignore
                 mapped_key = mapped_key[0]
-            defaults[mapped_key] = value if converter is None else converter(value)
-        model.objects.update_or_create(**{model_rc_id: row[id_key]}, defaults=defaults)
+            mapped_values[mapped_key] = value if converter is None else converter(value)
+        instances[row[id_key]] = model(**mapped_values)
+        if len(instances) >= 1000:
+            bulk_update_or_create(model, instances, model_rc_id, fields)
+            instances = {}
+
+
+def bulk_update_or_create(
+    model: Type[Model],
+    instances: Dict[str, Model],
+    model_rc_id: str,
+    fields: List[str],
+):
+    """Bulk update or create the instances."""
+    to_create = {**instances}
+    to_update = []
+    for primary_key, id_value in model.objects.filter(
+        **{f"{model_rc_id}__in": instances.keys()}
+    ).values_list("pk", model_rc_id):
+        instance = to_create.pop(id_value, None)
+        if instance is None:
+            continue
+        instance.pk = primary_key
+        to_update.append(instance)
+    model.objects.bulk_create(to_create.values())
+    model.objects.bulk_update(to_update, fields=fields)
