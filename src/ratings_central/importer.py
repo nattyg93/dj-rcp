@@ -141,7 +141,7 @@ def bulk_update_or_create(
     for primary_key, id_value in model.objects.filter(
         **{f"{model_rc_id}__in": instances.keys()}
     ).values_list("pk", model_rc_id):
-        instance = to_create.pop(id_value, None)
+        instance = to_create.pop(str(id_value), None)
         if instance is None:
             continue
         instance.pk = primary_key
