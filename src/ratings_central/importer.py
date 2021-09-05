@@ -127,6 +127,8 @@ def import_data_to_model(
         if len(instances) >= 1000:
             bulk_update_or_create(model, instances, model_rc_id, fields)
             instances = {}
+    if instances:
+        bulk_update_or_create(model, instances, model_rc_id, fields)
 
 
 def bulk_update_or_create(
